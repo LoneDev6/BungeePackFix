@@ -1,0 +1,8 @@
+messages:
+  ignored_pack:
+    enabled: true
+    message: "&6Skipped resourcepack installation (you already loaded it)."
+log:
+  ignored_respack: false
+  sent_respack: false
+  debug: false
