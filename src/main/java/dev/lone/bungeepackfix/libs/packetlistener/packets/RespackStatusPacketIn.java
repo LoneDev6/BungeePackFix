@@ -35,12 +35,19 @@ public class RespackStatusPacketIn extends PacketIn
     {
         PACKET_MAP = new LinkedHashMap<>();
 
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_8, 0x19);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_9, 0x16);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_12, 0x18);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_13, 0x1D);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_14, 0x1F);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_16, 0x21);
+        try
+        {
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_8, 0x19);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_9, 0x16);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_12, 0x18);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_13, 0x1D);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_14, 0x1F);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_16, 0x21);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19, 0x23);
+        }catch (Exception ignored)
+        {
+            // Failed to find constant, probably Bungeecord is outdated.
+        }
     }
     //</editor-fold>
 

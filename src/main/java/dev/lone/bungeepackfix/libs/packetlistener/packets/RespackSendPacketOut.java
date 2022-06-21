@@ -38,15 +38,22 @@ public class RespackSendPacketOut extends PacketOut
     {
         PACKET_MAP = new LinkedHashMap<>();
 
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_8, 0x48);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_9, 0x32);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_12, 0x34);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_13_1, 0x37);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_14, 0x39);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_15, 0x3A);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_16, 0x39);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_16_2, 0x38);
-        PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_17, 0x3C);
+        try
+        {
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_8, 0x48);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_9, 0x32);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_12, 0x34);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_13_1, 0x37);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_14, 0x39);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_15, 0x3A);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_16, 0x39);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_16_2, 0x38);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_17, 0x3C);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19, 0x3A);
+        }catch (Exception ignored)
+        {
+            // Failed to find constant, probably Bungeecord is outdated.
+        }
     }
     //</editor-fold>
 
@@ -84,7 +91,7 @@ public class RespackSendPacketOut extends PacketOut
         {
             Packets.runHandlers(wrapper, Packets.getUserConnection((DownstreamBridge) handler));
         }
-        else //sending this packet to the server? wtf
+        else // Sending "resourcepack apply" packet to the server? wtf
         {
             if (handler instanceof PacketHandler)
                 ((PacketHandler) handler).handle(wrapper);
@@ -144,6 +151,23 @@ public class RespackSendPacketOut extends PacketOut
         }
     }
 
+    public boolean equals(RespackSendPacketOut o,
+                          boolean checkHash,
+                          boolean checkForced,
+                          boolean checkMsg)
+    {
+        if (this == o)
+        return true;
+
+        if (o == null || this.getClass() != o.getClass())
+            return false;
+
+        return (Objects.equals(this.url, o.url)) &&
+                (!checkHash || Objects.equals(this.hash, o.hash)) &&
+                (!checkForced || Objects.equals(this.forced, o.forced)) &&
+                (!checkMsg || Objects.equals(this.promptMessage, o.promptMessage))
+                ;
+    }
     @Override
     public boolean equals(final Object o)
     {
@@ -154,13 +178,17 @@ public class RespackSendPacketOut extends PacketOut
             return false;
 
         final RespackSendPacketOut thizNuts = (RespackSendPacketOut) o;
-        return Objects.equals(this.url, thizNuts.url) && Objects.equals(this.hash, thizNuts.hash) && Objects.equals(this.forced, thizNuts.forced);
+        return Objects.equals(this.url, thizNuts.url) &&
+                Objects.equals(this.hash, thizNuts.hash) &&
+                Objects.equals(this.forced, thizNuts.forced) &&
+                Objects.equals(this.promptMessage, thizNuts.promptMessage)
+                ;
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(this.url, this.hash, this.forced);
+        return Objects.hash(this.url, this.hash, this.forced, this.promptMessage);
     }
 
     @Override

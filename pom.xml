@@ -14,6 +14,7 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jars_libs_folder>C:/Progetti/Minecraft/Spigot/_jars</jars_libs_folder>
     </properties>
 
     <build>
@@ -64,16 +65,24 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.16-R0.5-SNAPSHOT</version>
+            <version>1.19-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.16-R0.5-SNAPSHOT</version>
+            <version>1.19-R0.1-SNAPSHOT</version>
             <type>javadoc</type>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>libs</groupId>
+            <artifactId>Waterfall</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${jars_libs_folder}/bungee/waterfall.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

@@ -68,7 +68,12 @@ public final class Main extends Plugin implements Listener
             PlayerPackCache cache = playersPacks.get(conn.getUniqueId());
             if(cache != null && cache.installedSuccessfully)
             {
-                if(cache.matches(packet))
+                if(cache.matches(
+                        packet,
+                        settings.equal_pack_attributes_hash,
+                        settings.equal_pack_attributes_forced,
+                        settings.equal_pack_attributes_prompt_message
+                ))
                 {
                     if(settings.log_ignored_respack)
                         logger.log(Level.WARNING, "Ignored already sent packet: " + conn.getName() + " " + cache.cachedPacket);

@@ -25,8 +25,11 @@ public class PlayerPackCache
         this.cachedPacket = cachedPacket;
     }
 
-    public boolean matches(RespackSendPacketOut packet)
+    public boolean matches(RespackSendPacketOut packet,
+                           boolean checkHash,
+                           boolean checkForced,
+                           boolean checkMsg)
     {
-        return cachedPacket.equals(packet);
+        return cachedPacket.equals(packet, checkHash, checkForced, checkMsg);
     }
 }

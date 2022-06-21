@@ -20,6 +20,10 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 public class Settings
 {
+    public boolean equal_pack_attributes_hash;
+    public boolean equal_pack_attributes_forced;
+    public boolean equal_pack_attributes_prompt_message;
+
     public boolean log_debug;
     public boolean log_ignored_respack;
     public boolean log_sent_respack;
@@ -30,6 +34,10 @@ public class Settings
     {
         YamlConfig config = new YamlConfig("config.yml", plugin);
         config.saveDefaultConfig();
+
+        equal_pack_attributes_hash = config.getConfig().getBoolean("equal_pack_attributes.hash", true);
+        equal_pack_attributes_forced = config.getConfig().getBoolean("equal_pack_attributes.forced", true);
+        equal_pack_attributes_prompt_message = config.getConfig().getBoolean("equal_pack_attributes.prompt_message", true);
 
         log_debug = config.getConfig().getBoolean("log.debug", false);
         log_ignored_respack = config.getConfig().getBoolean("log.ignored_respack", false);
