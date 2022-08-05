@@ -44,7 +44,7 @@ public class RespackStatusPacketIn extends PacketIn
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_14, 0x1F);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_16, 0x21);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19, 0x23);
-            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_1, 0x3A);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_1, 0x24);
         }catch (Exception ignored)
         {
             // Failed to find constant, probably Bungeecord is outdated.
