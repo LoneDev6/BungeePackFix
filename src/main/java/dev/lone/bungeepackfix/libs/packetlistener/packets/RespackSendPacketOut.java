@@ -158,7 +158,7 @@ public class RespackSendPacketOut extends PacketOut
                           boolean checkMsg)
     {
         if (this == o)
-        return true;
+            return true;
 
         if (o == null || this.getClass() != o.getClass())
             return false;
