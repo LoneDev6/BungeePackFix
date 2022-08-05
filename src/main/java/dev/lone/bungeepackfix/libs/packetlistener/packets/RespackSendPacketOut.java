@@ -50,7 +50,7 @@ public class RespackSendPacketOut extends PacketOut
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_16_2, 0x38);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_17, 0x3C);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19, 0x3A);
-            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_1, 0x3A);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_1, 0x23);
         }catch (Exception ignored)
         {
             // Failed to find constant, probably Bungeecord is outdated.
