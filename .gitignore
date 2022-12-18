@@ -1,5 +1,7 @@
 # User-specific stuff
 .idea/
+.gradle/
+jars/
 
 *.iml
 *.ipr
@@ -113,5 +115,5 @@ buildNumber.properties
 run/
 
 # Other stuff
-/src/test/
+/bungee/src/test/
 /assets/
