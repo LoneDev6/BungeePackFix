@@ -2,6 +2,7 @@
 .idea/
 .gradle/
 jars/
+build/
 
 *.iml
 *.ipr
