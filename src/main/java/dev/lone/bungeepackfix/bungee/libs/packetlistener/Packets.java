@@ -11,11 +11,11 @@
  * License: Apache 2.0
  * Licensor: LoneDev
  */
-package dev.lone.bungeepackfix.libs.packetlistener;
+package dev.lone.bungeepackfix.bungee.libs.packetlistener;
 
-import dev.lone.bungeepackfix.libs.packetlistener.packets.Packet;
-import dev.lone.bungeepackfix.libs.packetlistener.packets.PacketIn;
-import dev.lone.bungeepackfix.libs.packetlistener.packets.PacketOut;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.Packet;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.PacketIn;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.PacketOut;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;

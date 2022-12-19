@@ -11,8 +11,6 @@
  * License: Apache 2.0
  * Licensor: LoneDev
  */
-package dev.lone.bungeepackfix.libs.packetlistener.packets;
+package dev.lone.bungeepackfix.bungee.libs.packetlistener.packets;
 
-import net.md_5.bungee.protocol.DefinedPacket;
-
-public abstract class Packet extends DefinedPacket {}
+public abstract class PacketOut extends Packet {}

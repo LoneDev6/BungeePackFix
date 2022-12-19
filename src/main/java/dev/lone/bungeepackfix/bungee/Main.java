@@ -11,11 +11,11 @@
  * License: Apache 2.0
  * Licensor: LoneDev
  */
-package dev.lone.bungeepackfix;
+package dev.lone.bungeepackfix.bungee;
 
-import dev.lone.bungeepackfix.libs.packetlistener.Packets;
-import dev.lone.bungeepackfix.libs.packetlistener.packets.RespackSendPacketOut;
-import dev.lone.bungeepackfix.libs.packetlistener.packets.RespackStatusPacketIn;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.Packets;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.RespackSendPacketOut;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.RespackStatusPacketIn;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
