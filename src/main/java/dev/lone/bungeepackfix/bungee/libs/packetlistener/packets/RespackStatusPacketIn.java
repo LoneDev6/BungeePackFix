@@ -11,9 +11,9 @@
  * License: Apache 2.0
  * Licensor: LoneDev
  */
-package dev.lone.bungeepackfix.libs.packetlistener.packets;
+package dev.lone.bungeepackfix.bungee.libs.packetlistener.packets;
 
-import dev.lone.bungeepackfix.libs.packetlistener.Packets;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.Packets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.md_5.bungee.connection.UpstreamBridge;

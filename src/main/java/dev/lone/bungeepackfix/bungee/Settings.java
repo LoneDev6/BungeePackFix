@@ -11,9 +11,9 @@
  * License: Apache 2.0
  * Licensor: LoneDev
  */
-package dev.lone.bungeepackfix;
+package dev.lone.bungeepackfix.bungee;
 
-import dev.lone.bungeepackfix.libs.YamlConfig;
+import dev.lone.bungeepackfix.bungee.libs.YamlConfig;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Plugin;

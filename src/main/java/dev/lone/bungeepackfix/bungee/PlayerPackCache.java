@@ -11,9 +11,9 @@
  * License: Apache 2.0
  * Licensor: LoneDev
  */
-package dev.lone.bungeepackfix;
+package dev.lone.bungeepackfix.bungee;
 
-import dev.lone.bungeepackfix.libs.packetlistener.packets.RespackSendPacketOut;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.RespackSendPacketOut;
 
 public class PlayerPackCache
 {
