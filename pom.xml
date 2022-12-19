@@ -6,7 +6,7 @@
 
     <groupId>BungeePackFix</groupId>
     <artifactId>BungeePackFix</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.8</version>
     <packaging>jar</packaging>
 
     <name>BungeePackFix</name>
