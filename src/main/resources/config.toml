@@ -1,0 +1,13 @@
+[messages]
+enabled = true
+message = "<gold>Skipped resourcepack installation (you already loaded it)."
+
+[equal_pack_attributes]
+hash = true
+forced = true
+prompt_message = true
+
+[log]
+ignored_respack = false
+sent_respack = false
+debug = false
