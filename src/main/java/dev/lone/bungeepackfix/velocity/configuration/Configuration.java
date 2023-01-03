@@ -34,7 +34,7 @@ public class Configuration {
 
         public Messages(@Nullable Toml toml) {
             if (toml != null) {
-                this.enabled = toml.getBoolean("enable", true);
+                this.enabled = toml.getBoolean("enabled", true);
                 this.message = toml.getString("message", "<gold>Skipped resourcepack installation (you already loaded it).");
             } else {
                 this.enabled = true;
