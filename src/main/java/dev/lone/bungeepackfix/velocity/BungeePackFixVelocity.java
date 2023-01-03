@@ -19,7 +19,7 @@ import java.nio.file.Path;
 @Plugin(
         id = "bungeepackfix",
         name = "BungeePackFix (Velocity)",
-        version = "1.0.8",
+        version = "1.0.9",
         description = "Avoid sending resourcepacks again if it's the same resourcepack. Useful when you switch servers.", authors = {"LoneDev", "YoSoyVillaa"}
 )
 public class BungeePackFixVelocity {
