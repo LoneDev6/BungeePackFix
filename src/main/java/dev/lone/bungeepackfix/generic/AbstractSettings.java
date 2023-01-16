@@ -1,22 +1,19 @@
-/*
- * "Commons Clause" License Condition v1.0
- *
- * The Software is provided to you by the Licensor under the License, as defined below, subject to the following condition.
- *
- * Without limiting other conditions in the License, the grant of rights under the License will not include, and the License does not grant to you,  right to Sell the Software.
- *
- * For purposes of the foregoing, "Sell" means practicing any or all of the rights granted to you under the License to provide to third parties, for a fee or other consideration (including without limitation fees for hosting or consulting/ support services related to the Software), a product or service whose value derives, entirely or substantially, from the functionality of the Software.  Any license notice or attribution required by the License must also include this Commons Cause License Condition notice.
- *
- * Software: BungeePackFix
- * License: Apache 2.0
- * Licensor: LoneDev
- */
 package dev.lone.bungeepackfix.generic;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.ComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 public abstract class AbstractSettings<T>
 {
+    protected ComponentSerializer<Component, ?, String> SERIALIZER;
+
     public boolean equal_pack_attributes_hash;
     public boolean equal_pack_attributes_forced;
     public boolean equal_pack_attributes_prompt_message;
@@ -29,5 +26,40 @@ public abstract class AbstractSettings<T>
     public boolean log_ignored_respack;
     public boolean log_sent_respack;
     public boolean ignored_pack_msg_enabled;
+
+    public boolean minimessage_support;
+
     public T ignored_pack_msg;
+
+    protected YamlConfig config;
+
+    public AbstractSettings(Path dataDirectory) throws IOException
+    {
+        config = new YamlConfig(new File(dataDirectory.toFile(), "config.yml").toPath());
+        config.load();
+
+        equal_pack_attributes_hash = config.getBoolean("equal_pack_attributes.hash", true);
+        equal_pack_attributes_forced = config.getBoolean("equal_pack_attributes.forced", true);
+        equal_pack_attributes_prompt_message = config.getBoolean("equal_pack_attributes.prompt_message", true);
+
+        ignore_hash_in_url = config.getBoolean("ignore_hash_in_url", true);
+        main_server_name = config.getString("main_server_name", "server_1");
+        ignored_servers = config.getStringList("ignored_servers");
+
+        log_debug = config.getBoolean("log.debug", false);
+        log_ignored_respack = config.getBoolean("log.ignored_respack", false);
+        log_sent_respack = config.getBoolean("log.sent_respack", false);
+        ignored_pack_msg_enabled = config.getBoolean("messages.ignored_pack.enabled", true);
+
+        minimessage_support = config.getBoolean("messages.minimessage_support", false);
+
+        if(minimessage_support)
+            SERIALIZER = MiniMessage.miniMessage();
+        else
+            SERIALIZER = LegacyComponentSerializer.legacyAmpersand();
+
+        runPlatformDependentCode();
+    }
+
+    protected abstract void runPlatformDependentCode();
 }

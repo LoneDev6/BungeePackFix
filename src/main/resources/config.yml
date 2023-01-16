@@ -1,4 +1,5 @@
 messages:
+  minimessage_support: false
   ignored_pack:
     enabled: true
     message: "&6Skipped resourcepack installation (you already loaded it)."

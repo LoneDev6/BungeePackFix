@@ -1,28 +1,17 @@
-/*
- * "Commons Clause" License Condition v1.0
- *
- * The Software is provided to you by the Licensor under the License, as defined below, subject to the following condition.
- *
- * Without limiting other conditions in the License, the grant of rights under the License will not include, and the License does not grant to you,  right to Sell the Software.
- *
- * For purposes of the foregoing, "Sell" means practicing any or all of the rights granted to you under the License to provide to third parties, for a fee or other consideration (including without limitation fees for hosting or consulting/ support services related to the Software), a product or service whose value derives, entirely or substantially, from the functionality of the Software.  Any license notice or attribution required by the License must also include this Commons Cause License Condition notice.
- *
- * Software: BungeePackFix
- * License: Apache 2.0
- * Licensor: LoneDev
- */
 package dev.lone.bungeepackfix.bungee;
 
-import dev.lone.bungeepackfix.bungee.libs.packetlistener.Packets;
-import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.impl.ClientboundResourcePackPacket;
-import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.impl.ServerboundResourcePackPacket;
+import dev.lone.bungeepackfix.bungee.packets.Packets;
+import dev.lone.bungeepackfix.bungee.packets.impl.ClientboundResourcePackPacket;
+import dev.lone.bungeepackfix.bungee.packets.impl.ServerboundResourcePackPacket;
 import dev.lone.bungeepackfix.generic.PackUtility;
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -32,6 +21,7 @@ import java.util.logging.Logger;
 public final class Main extends Plugin implements Listener
 {
     public static Logger logger;
+    private BungeeAudiences adventure;
     public Settings settings;
 
     HashMap<UUID, BungeePlayerPackCache> playersCache = new HashMap<>();
@@ -40,7 +30,17 @@ public final class Main extends Plugin implements Listener
     public void onEnable()
     {
         logger = this.getLogger();
-        settings = new Settings(this);
+        adventure = BungeeAudiences.create(this);
+        try
+        {
+            settings = new Settings(this.getDataFolder().toPath());
+        }
+        catch (Throwable ex)
+        {
+            ex.printStackTrace();
+            logger.severe("Disabling plugin.");
+            return;
+        }
 
         registerPackets();
         getProxy().getPluginManager().registerListener(this, this);
@@ -55,12 +55,27 @@ public final class Main extends Plugin implements Listener
     public void onDisable()
     {
         logger = null;
+        if (this.adventure != null)
+        {
+            this.adventure.close();
+            this.adventure = null;
+        }
     }
 
     @EventHandler
     public void onPlayerDisconnect(PlayerDisconnectEvent e)
     {
         playersCache.remove(e.getPlayer().getUniqueId());
+    }
+
+    @NonNull
+    public BungeeAudiences adventure()
+    {
+        if (this.adventure == null)
+        {
+            throw new IllegalStateException("Cannot retrieve audience provider while plugin is not enabled");
+        }
+        return this.adventure;
     }
 
     private void registerPackets()

@@ -17,21 +17,21 @@ import java.util.concurrent.TimeUnit;
 @Plugin(
         id = "bungeepackfix",
         name = "BungeePackFix (Velocity)",
-        version = "1.1.0",
+        version = "1.1.0-r2",
         description = "Avoid sending resourcepacks again if it's the same resourcepack. Useful when you switch servers.", authors = {"LoneDev", "YoSoyVillaa"}
 )
 public class BungeePackFixVelocity
 {
-    private final Path pluginPath;
+    private final Path dataDirectory;
     private final Logger logger;
     private final ProxyServer proxy;
     public Settings settings;
 
     @Inject
-    public BungeePackFixVelocity(ProxyServer proxy, @DataDirectory Path pluginPath, Logger logger)
+    public BungeePackFixVelocity(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger)
     {
         this.proxy = proxy;
-        this.pluginPath = pluginPath;
+        this.dataDirectory = dataDirectory;
         this.logger = logger;
     }
 
@@ -58,13 +58,13 @@ public class BungeePackFixVelocity
         try
         {
             //TODO add metrics
-            this.settings = new Settings(pluginPath);
+            this.settings = new Settings(dataDirectory);
             proxy.getEventManager().register(this, new ServerResourcePackSendListener(this));
         }
         catch (Throwable ex)
         {
             ex.printStackTrace();
-            logger.error("Disabling features");
+            logger.error("Disabling plugin.");
         }
     }
 

@@ -6,7 +6,7 @@
 
     <groupId>BungeePackFix</groupId>
     <artifactId>BungeePackFix</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.0-r2</version>
     <packaging>jar</packaging>
 
     <name>BungeePackFix</name>
@@ -45,6 +45,68 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0-SNAPSHOT</version>
+                <configuration>
+                    <minimizeJar>true</minimizeJar> <!-- Used to remove unused libs code from the "includes" list -->
+                    <filters>
+                        <filter>
+                            <excludeDefaults>false</excludeDefaults>
+                            <artifact>*:*</artifact>
+                            <includes>
+                                <include>org.apache.*</include>
+                                <include>math.fast.*</include>
+                            </includes>
+                            <!-- Do not include META-INF of the libs in the final build -->
+                            <excludes>
+                                <exclude>META-INF/**</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml
+                    </dependencyReducedPomLocation>
+                    <relocations>
+                        <!-- Shade libs -->
+                        <relocation>
+                            <pattern>net.skinsrestorer</pattern>
+                            <shadedPattern>dev.lone.shaded.bungeepackfix.net.skinsrestorer</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.jetbrains</pattern>
+                            <shadedPattern>dev.lone.shaded.bungeepackfix.org.jetbrains</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.apache</pattern>
+                            <shadedPattern>dev.lone.shaded.bungeepackfix.org.apache</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.yaml</pattern>
+                            <shadedPattern>dev.lone.shaded.bungeepackfix.org.yaml</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.kyori.adventure.text.serializer.bungeecord.</pattern>
+                            <shadedPattern>dev.lone.shaded.bungeepackfix.net.kyori.adventure.text.serializer.bungeecord</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.kyori.adventure.text.minimessage.</pattern>
+                            <shadedPattern>dev.lone.shaded.bungeepackfix.net.kyori.adventure.text.minimessage</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -63,6 +125,10 @@
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -76,7 +142,34 @@
         <dependency>
             <groupId>com.velocitypowered</groupId>
             <artifactId>velocity-api</artifactId>
-            <version>3.1.2-SNAPSHOT</version>
+            <version>3.2.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.SkinsRestorer</groupId>
+            <artifactId>axiom</artifactId>
+            <version>main-aa9a31fe25-1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>23.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-minimessage</artifactId>
+            <version>4.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bungeecord</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+        <!-- To avoid including it in the jar -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
