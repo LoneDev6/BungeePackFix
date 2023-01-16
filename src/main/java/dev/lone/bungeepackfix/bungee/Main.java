@@ -14,8 +14,9 @@
 package dev.lone.bungeepackfix.bungee;
 
 import dev.lone.bungeepackfix.bungee.libs.packetlistener.Packets;
-import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.RespackSendPacketOut;
-import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.RespackStatusPacketIn;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.impl.ClientboundResourcePackPacket;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.impl.ServerboundResourcePackPacket;
+import dev.lone.bungeepackfix.generic.PackUtility;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -33,7 +34,7 @@ public final class Main extends Plugin implements Listener
     public static Logger logger;
     public Settings settings;
 
-    HashMap<UUID, PlayerPackCache> playersPacks = new HashMap<>();
+    HashMap<UUID, BungeePlayerPackCache> playersCache = new HashMap<>();
 
     @Override
     public void onEnable()
@@ -44,8 +45,9 @@ public final class Main extends Plugin implements Listener
         registerPackets();
         getProxy().getPluginManager().registerListener(this, this);
 
+        //TODO fix metrics backend URL
         ProxyServer.getInstance().getScheduler().runAsync(this, () -> {
-            Metrics metrics = new Metrics(this, 13008);
+            new Metrics(this, 13008);
         });
     }
 
@@ -58,63 +60,76 @@ public final class Main extends Plugin implements Listener
     @EventHandler
     public void onPlayerDisconnect(PlayerDisconnectEvent e)
     {
-        playersPacks.remove(e.getPlayer().getUniqueId());
+        playersCache.remove(e.getPlayer().getUniqueId());
     }
 
     private void registerPackets()
     {
-        RespackSendPacketOut.register();
-        Packets.registerHandler(RespackSendPacketOut.class, (packet, conn) -> {
-            PlayerPackCache cache = playersPacks.get(conn.getUniqueId());
+        ClientboundResourcePackPacket.register();
+        Packets.registerHandler(ClientboundResourcePackPacket.class, (packet, conn) -> {
+
+            if(isIgnoredServer(conn))
+                return false;
+
+            BungeePlayerPackCache cache = playersCache.get(conn.getUniqueId());
             if(cache != null && cache.installedSuccessfully)
             {
-                if(cache.matches(
+                if(cache.isSamePack(
                         packet,
-                        settings.equal_pack_attributes_hash,
-                        settings.equal_pack_attributes_forced,
-                        settings.equal_pack_attributes_prompt_message
+                        conn,
+                        settings
                 ))
                 {
                     if(settings.log_ignored_respack)
-                        logger.log(Level.WARNING, "Ignored already sent packet: " + conn.getName() + " " + cache.cachedPacket);
+                        logger.log(Level.WARNING, "Ignored already sent pack: " + conn.getName() + " " + cache.cachedPacket);
                     if(settings.ignored_pack_msg_enabled)
                         conn.sendMessage(settings.ignored_pack_msg);
+
                     handleIgnoredPacket(conn);
                     return true;
                 }
                 else
                 {
-                    playersPacks.put(conn.getUniqueId(), new PlayerPackCache(packet));
+                    playersCache.put(conn.getUniqueId(), new BungeePlayerPackCache(packet));
                 }
             }
             else
             {
-                playersPacks.put(conn.getUniqueId(), new PlayerPackCache(packet));
+                playersCache.put(conn.getUniqueId(), new BungeePlayerPackCache(packet));
             }
 
             if(settings.log_sent_respack)
-                logger.log(Level.WARNING, "Sending packet: " + conn.getName() + " " + packet);
+                logger.log(Level.WARNING, "Sending pack: " + conn.getName() + " " + packet);
 
             return false;
         });
 
-        RespackStatusPacketIn.register();
-        Packets.registerHandler(RespackStatusPacketIn.class, (packet, conn) -> {
-            if(settings.log_debug)
-                logger.log(Level.WARNING, "RespackStatusPacketIn: " + conn.getName() + " " + RespackStatusPacketIn.Status.values()[packet.status]);
+        ServerboundResourcePackPacket.register();
+        Packets.registerHandler(ServerboundResourcePackPacket.class, (packet, conn) -> {
 
-            if(packet.status == RespackStatusPacketIn.Status.SUCCESSFULLY_LOADED.ordinal())
+            if(isIgnoredServer(conn))
+                return false;
+
+            if(settings.log_debug)
+                logger.log(Level.WARNING, "RespackStatusPacketIn: " + conn.getName() + " " + ServerboundResourcePackPacket.Status.values()[packet.status]);
+
+            if(packet.status == ServerboundResourcePackPacket.Status.SUCCESSFULLY_LOADED.ordinal())
             {
-                PlayerPackCache cache = playersPacks.get(conn.getUniqueId());
+                BungeePlayerPackCache cache = playersCache.get(conn.getUniqueId());
                 if(cache != null)
                     cache.installedSuccessfully = true;
             }
-            else if(packet.status == RespackStatusPacketIn.Status.FAILED_DOWNLOAD.ordinal())
+            else if(packet.status == ServerboundResourcePackPacket.Status.FAILED_DOWNLOAD.ordinal())
             {
-                playersPacks.remove(conn.getUniqueId());
+                playersCache.remove(conn.getUniqueId());
             }
             return false;
         });
+    }
+
+    private boolean isIgnoredServer(UserConnection conn)
+    {
+        return (settings.ignored_servers.contains(conn.getServer().getInfo().getName()));
     }
 
     /**
@@ -124,23 +139,11 @@ public final class Main extends Plugin implements Listener
      */
     private void handleIgnoredPacket(UserConnection conn)
     {
-//        PacketsRegister.sendProxiedPacket(
-//                this,
-//                e.getPlayer(),
-//                new RespackStatusPacketIn(RespackStatusPacketIn.Status.ACCEPTED),
-//                500L
-//        );
-//        PacketsRegister.sendProxiedPacket(
-//                this,
-//                e.getPlayer(),
-//                new RespackStatusPacketIn(RespackStatusPacketIn.Status.SUCCESSFULLY_LOADED),
-//                1500L
-//        );
         Packets.sendPacketToServer(
                 this,
                 conn,
-                new RespackStatusPacketIn(RespackStatusPacketIn.Status.SUCCESSFULLY_LOADED),
-                200L
+                new ServerboundResourcePackPacket(ServerboundResourcePackPacket.Status.SUCCESSFULLY_LOADED),
+                PackUtility.DELAY_MS_FAKE_SUCCESS_PACKET
         );
     }
 }

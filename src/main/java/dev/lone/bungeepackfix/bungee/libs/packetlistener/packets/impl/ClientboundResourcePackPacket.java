@@ -11,9 +11,11 @@
  * License: Apache 2.0
  * Licensor: LoneDev
  */
-package dev.lone.bungeepackfix.bungee.libs.packetlistener.packets;
+package dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.impl;
 
 import dev.lone.bungeepackfix.bungee.libs.packetlistener.Packets;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.ClientboundPacket;
+import dev.lone.bungeepackfix.generic.PackUtility;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.md_5.bungee.connection.DownstreamBridge;
@@ -21,11 +23,12 @@ import net.md_5.bungee.netty.PacketHandler;
 import net.md_5.bungee.protocol.AbstractPacketHandler;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.ProtocolConstants;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
-public class RespackSendPacketOut extends PacketOut
+public class ClientboundResourcePackPacket extends ClientboundPacket
 {
     public String url;
     public String hash;
@@ -65,30 +68,30 @@ public class RespackSendPacketOut extends PacketOut
     public static void register()
     {
         Packets.registerPacket(
-                RespackSendPacketOut::new,
+                ClientboundResourcePackPacket::new,
                 PACKET_MAP
         );
     }
 
-    public RespackSendPacketOut(final String url, final String hash)
+    public ClientboundResourcePackPacket(final String url, final String hash)
     {
         this.url = url;
         this.hash = hash;
     }
 
-    public RespackSendPacketOut(final String url, final String hash, final boolean forced, final String promptMessage)
+    public ClientboundResourcePackPacket(final String url, final String hash, final boolean forced, final String promptMessage)
     {
         this(url, hash);
         this.forced = forced;
         this.promptMessage = promptMessage;
     }
 
-    public RespackSendPacketOut() {}
+    public ClientboundResourcePackPacket() {}
 
     @Override
     public void handle(final AbstractPacketHandler handler) throws Exception
     {
-        PacketWrapper wrapper = new PacketWrapper(this, Unpooled.EMPTY_BUFFER);
+        final PacketWrapper wrapper = new PacketWrapper(this, Unpooled.EMPTY_BUFFER);
         if (handler instanceof DownstreamBridge)
         {
             Packets.runHandlers(wrapper, Packets.getUserConnection((DownstreamBridge) handler));
@@ -153,23 +156,34 @@ public class RespackSendPacketOut extends PacketOut
         }
     }
 
-    public boolean equals(RespackSendPacketOut o,
-                          boolean checkHash,
-                          boolean checkForced,
-                          boolean checkMsg)
+    @Nullable
+    public String getUrlHashtag()
     {
-        if (this == o)
+        return PackUtility.getUrlHashtag(url);
+    }
+
+    public boolean isSamePack(ClientboundResourcePackPacket newPack,
+                              boolean ignoreHashtagInUrl,
+                              boolean checkHash,
+                              boolean checkForced,
+                              boolean checkMsg)
+    {
+        if (this == newPack)
             return true;
 
-        if (o == null || this.getClass() != o.getClass())
+        if (newPack == null || this.getClass() != newPack.getClass())
             return false;
 
-        return (Objects.equals(this.url, o.url)) &&
-                (!checkHash || Objects.equals(this.hash, o.hash)) &&
-                (!checkForced || Objects.equals(this.forced, o.forced)) &&
-                (!checkMsg || Objects.equals(this.promptMessage, o.promptMessage))
+        final String newUrl = PackUtility.removeHashtag(ignoreHashtagInUrl, newPack.url);
+        final String prevUrl = PackUtility.removeHashtag(ignoreHashtagInUrl, this.url);
+
+        return (Objects.equals(prevUrl, newUrl)) &&
+                (!checkHash || Objects.equals(this.hash, newPack.hash)) &&
+                (!checkForced || Objects.equals(this.forced, newPack.forced)) &&
+                (!checkMsg || Objects.equals(this.promptMessage, newPack.promptMessage))
                 ;
     }
+
     @Override
     public boolean equals(final Object o)
     {
@@ -179,11 +193,11 @@ public class RespackSendPacketOut extends PacketOut
         if (o == null || this.getClass() != o.getClass())
             return false;
 
-        final RespackSendPacketOut thizNuts = (RespackSendPacketOut) o;
-        return Objects.equals(this.url, thizNuts.url) &&
-                Objects.equals(this.hash, thizNuts.hash) &&
-                Objects.equals(this.forced, thizNuts.forced) &&
-                Objects.equals(this.promptMessage, thizNuts.promptMessage)
+        final ClientboundResourcePackPacket thisNut = (ClientboundResourcePackPacket) o;
+        return Objects.equals(this.url, thisNut.url) &&
+                Objects.equals(this.hash, thisNut.hash) &&
+                Objects.equals(this.forced, thisNut.forced) &&
+                Objects.equals(this.promptMessage, thisNut.promptMessage)
                 ;
     }
 
@@ -196,6 +210,6 @@ public class RespackSendPacketOut extends PacketOut
     @Override
     public String toString()
     {
-        return "RespackSendPacketOut{url='" + this.url + '\'' + ", hash=" + this.hash + ", forced=" + this.forced + ", promptMessage=" + this.promptMessage + '}';
+        return "ClientboundResourcePackPacket{url='" + this.url + '\'' + ", hash=" + this.hash + ", forced=" + this.forced + ", promptMessage=" + this.promptMessage + '}';
     }
 }

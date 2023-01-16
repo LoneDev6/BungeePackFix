@@ -1,81 +1,76 @@
 package dev.lone.bungeepackfix.velocity;
 
 import com.google.inject.Inject;
-import com.moandjiezana.toml.Toml;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import dev.lone.bungeepackfix.velocity.configuration.Configuration;
 import dev.lone.bungeepackfix.velocity.listeners.ServerResourcePackSendListener;
 import org.slf4j.Logger;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 @Plugin(
         id = "bungeepackfix",
         name = "BungeePackFix (Velocity)",
-        version = "1.0.9",
+        version = "1.1.0",
         description = "Avoid sending resourcepacks again if it's the same resourcepack. Useful when you switch servers.", authors = {"LoneDev", "YoSoyVillaa"}
 )
-public class BungeePackFixVelocity {
-
+public class BungeePackFixVelocity
+{
     private final Path pluginPath;
     private final Logger logger;
     private final ProxyServer proxy;
-    private Configuration config;
+    public Settings settings;
 
     @Inject
-    public BungeePackFixVelocity(ProxyServer proxy, @DataDirectory Path pluginPath, Logger logger){
+    public BungeePackFixVelocity(ProxyServer proxy, @DataDirectory Path pluginPath, Logger logger)
+    {
         this.proxy = proxy;
         this.pluginPath = pluginPath;
         this.logger = logger;
     }
 
-    @Subscribe
-    public void onProxyInitialization(ProxyInitializeEvent event){
-        Toml toml = loadConfig();
-        if(toml == null) {
-            logger.error("-- Cannot load Configuration --");
-            logger.error("Disabling features");
-            return;
-        }
-        this.config = new Configuration(toml);
-        proxy.getEventManager().register(this, new ServerResourcePackSendListener(this));
-    }
-
-    public Logger getLogger() {
+    public Logger getLogger()
+    {
         return logger;
     }
 
-    public Configuration getConfig() {
-        return config;
+    public ProxyServer getProxy()
+    {
+        return proxy;
     }
 
-    private Toml loadConfig(){
-        if(!Files.exists(pluginPath)){
-            try {
-                Files.createDirectory(pluginPath);
-            } catch(IOException e){
-                return null;
-            }
+    public void runDelayedTask(Runnable runnable, long delayMs)
+    {
+        getProxy().getScheduler().buildTask(this, runnable)
+                .delay(delayMs, TimeUnit.MILLISECONDS)
+                .schedule();
+    }
+
+    @Subscribe
+    public void onProxyInitialization(ProxyInitializeEvent e)
+    {
+        try
+        {
+            //TODO add metrics
+            this.settings = new Settings(pluginPath);
+            proxy.getEventManager().register(this, new ServerResourcePackSendListener(this));
         }
-        Path configPath = pluginPath.resolve("config.toml");
-        if(!Files.exists(configPath)){
-            try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.toml")){
-                Files.copy(in, configPath);
-            } catch(IOException e){
-                return null;
-            }
+        catch (Throwable ex)
+        {
+            ex.printStackTrace();
+            logger.error("Disabling features");
         }
-        try {
-            return new Toml().read(Files.newInputStream(configPath));
-        } catch (IOException e){
-            return null;
-        }
+    }
+
+    @Subscribe(order = PostOrder.NORMAL)
+    public void onPlayerDisconnect(DisconnectEvent e)
+    {
+        VelocityPlayerPackCache.playersCache.remove(e.getPlayer().getUniqueId());
     }
 }

@@ -13,4 +13,4 @@
  */
 package dev.lone.bungeepackfix.bungee.libs.packetlistener.packets;
 
-public abstract class PacketOut extends Packet {}
+public abstract class ServerboundPacket extends Packet {}

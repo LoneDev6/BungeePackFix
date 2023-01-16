@@ -13,7 +13,6 @@
  */
 package dev.lone.bungeepackfix.bungee.libs;
 
-import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
@@ -22,19 +21,18 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class YamlConfig
 {
     private final File configFile;
     private final String fileName;
-    private final Plugin plugin;
     private static Configuration config;
 
-    public YamlConfig(String fileName, Plugin plugin)
+    public YamlConfig(String fileName, Path pluginPath)
     {
-        this.plugin = plugin;
         this.fileName = fileName;
-        this.configFile = new File(plugin.getDataFolder(), fileName);
+        this.configFile = new File(pluginPath.toFile(), fileName);
     }
 
     public Configuration getConfig()
@@ -52,7 +50,8 @@ public class YamlConfig
         {
             if (!this.configFile.exists())
             {
-                Files.copy(this.plugin.getResourceAsStream(this.fileName), this.configFile.toPath(), new CopyOption[0]);
+                //noinspection ConstantConditions
+                Files.copy(this.getClass().getClassLoader().getResourceAsStream(this.fileName), this.configFile.toPath(), new CopyOption[0]);
             }
             loadConfig();
         }
@@ -60,6 +59,8 @@ public class YamlConfig
         {
             ex.printStackTrace();
         }
+
+        //TODO: automatically add missing properties added between updates
     }
 
     public void loadConfig() throws IOException

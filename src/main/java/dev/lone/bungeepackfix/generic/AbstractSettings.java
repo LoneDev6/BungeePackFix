@@ -11,6 +11,23 @@
  * License: Apache 2.0
  * Licensor: LoneDev
  */
-package dev.lone.bungeepackfix.bungee.libs.packetlistener.packets;
+package dev.lone.bungeepackfix.generic;
 
-public abstract class PacketIn extends Packet {}
+import java.util.List;
+
+public abstract class AbstractSettings<T>
+{
+    public boolean equal_pack_attributes_hash;
+    public boolean equal_pack_attributes_forced;
+    public boolean equal_pack_attributes_prompt_message;
+
+    public boolean ignore_hash_in_url;
+    public String main_server_name;
+    public List<String> ignored_servers;
+
+    public boolean log_debug;
+    public boolean log_ignored_respack;
+    public boolean log_sent_respack;
+    public boolean ignored_pack_msg_enabled;
+    public T ignored_pack_msg;
+}

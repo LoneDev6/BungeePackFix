@@ -14,30 +14,25 @@
 package dev.lone.bungeepackfix.bungee;
 
 import dev.lone.bungeepackfix.bungee.libs.YamlConfig;
+import dev.lone.bungeepackfix.generic.AbstractSettings;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Plugin;
 
-public class Settings
+public class Settings extends AbstractSettings<TextComponent>
 {
-    public boolean equal_pack_attributes_hash;
-    public boolean equal_pack_attributes_forced;
-    public boolean equal_pack_attributes_prompt_message;
-
-    public boolean log_debug;
-    public boolean log_ignored_respack;
-    public boolean log_sent_respack;
-    public boolean ignored_pack_msg_enabled;
-    public TextComponent ignored_pack_msg;
-
     public Settings(Plugin plugin)
     {
-        YamlConfig config = new YamlConfig("config.yml", plugin);
+        YamlConfig config = new YamlConfig("config.yml", plugin.getDataFolder().toPath());
         config.saveDefaultConfig();
 
         equal_pack_attributes_hash = config.getConfig().getBoolean("equal_pack_attributes.hash", true);
         equal_pack_attributes_forced = config.getConfig().getBoolean("equal_pack_attributes.forced", true);
         equal_pack_attributes_prompt_message = config.getConfig().getBoolean("equal_pack_attributes.prompt_message", true);
+
+        ignore_hash_in_url = config.getConfig().getBoolean("ignore_hash_in_url", true);
+        main_server_name = config.getConfig().getString("main_server_name", "server_1");
+        ignored_servers = config.getConfig().getStringList("ignored_servers");
 
         log_debug = config.getConfig().getBoolean("log.debug", false);
         log_ignored_respack = config.getConfig().getBoolean("log.ignored_respack", false);

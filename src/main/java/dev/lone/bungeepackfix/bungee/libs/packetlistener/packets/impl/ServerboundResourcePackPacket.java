@@ -11,9 +11,10 @@
  * License: Apache 2.0
  * Licensor: LoneDev
  */
-package dev.lone.bungeepackfix.bungee.libs.packetlistener.packets;
+package dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.impl;
 
 import dev.lone.bungeepackfix.bungee.libs.packetlistener.Packets;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.ServerboundPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.md_5.bungee.connection.UpstreamBridge;
@@ -25,7 +26,7 @@ import net.md_5.bungee.protocol.ProtocolConstants;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
-public class RespackStatusPacketIn extends PacketIn
+public class ServerboundResourcePackPacket extends ServerboundPacket
 {
     public int status;
 
@@ -58,19 +59,19 @@ public class RespackStatusPacketIn extends PacketIn
     public static void register()
     {
         Packets.registerPacket(
-                RespackStatusPacketIn::new,
+                ServerboundResourcePackPacket::new,
                 PACKET_MAP
         );
     }
 
-    public RespackStatusPacketIn(int status)
+    public ServerboundResourcePackPacket(int status)
     {
         this.status = status;
     }
 
-    public RespackStatusPacketIn() {}
+    public ServerboundResourcePackPacket() {}
 
-    public RespackStatusPacketIn(Status status)
+    public ServerboundResourcePackPacket(Status status)
     {
         this.status = status.ordinal();
     }
@@ -78,7 +79,7 @@ public class RespackStatusPacketIn extends PacketIn
     @Override
     public void handle(final AbstractPacketHandler handler) throws Exception
     {
-        PacketWrapper wrapper = new PacketWrapper(this, Unpooled.EMPTY_BUFFER);
+        final PacketWrapper wrapper = new PacketWrapper(this, Unpooled.EMPTY_BUFFER);
         if (handler instanceof UpstreamBridge)
         {
             Packets.runHandlers(wrapper, Packets.getUserConnection((UpstreamBridge) handler));
@@ -123,8 +124,8 @@ public class RespackStatusPacketIn extends PacketIn
         if (o == null || this.getClass() != o.getClass())
             return false;
 
-        final RespackStatusPacketIn thizNuts = (RespackStatusPacketIn) o;
-        return Objects.equals(this.status, thizNuts.status);
+        final ServerboundResourcePackPacket thisNut = (ServerboundResourcePackPacket) o;
+        return Objects.equals(this.status, thisNut.status);
     }
 
     @Override
@@ -136,7 +137,7 @@ public class RespackStatusPacketIn extends PacketIn
     @Override
     public String toString()
     {
-        return "RespackStatusPacketIn{status=" + Status.values()[this.status] + "}";
+        return "ServerboundResourcePackPacket{status=" + Status.values()[this.status] + "}";
     }
 
     public enum Status

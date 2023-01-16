@@ -14,8 +14,8 @@
 package dev.lone.bungeepackfix.bungee.libs.packetlistener;
 
 import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.Packet;
-import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.PacketIn;
-import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.PacketOut;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.ServerboundPacket;
+import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.ClientboundPacket;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
@@ -143,9 +143,9 @@ public class Packets
     public static void registerPacket(Supplier<? extends DefinedPacket> packetConstructor, LinkedHashMap<Integer, Integer> packetMap)
     {
         Object dir = null;
-        if(packetConstructor.get() instanceof PacketIn)
+        if(packetConstructor.get() instanceof ServerboundPacket)
             dir = TO_SERVER;
-        else if(packetConstructor.get() instanceof PacketOut)
+        else if(packetConstructor.get() instanceof ClientboundPacket)
             dir = TO_CLIENT;
 
         if(dir == null)

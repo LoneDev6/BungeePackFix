@@ -11,25 +11,33 @@
  * License: Apache 2.0
  * Licensor: LoneDev
  */
-package dev.lone.bungeepackfix.bungee;
 
-import dev.lone.bungeepackfix.bungee.libs.packetlistener.packets.RespackSendPacketOut;
+package dev.lone.bungeepackfix.generic;
 
-public class PlayerPackCache
+import org.jetbrains.annotations.Nullable;
+
+public class PackUtility
 {
-    public RespackSendPacketOut cachedPacket;
-    public boolean installedSuccessfully;
+    public static final long DELAY_MS_FAKE_SUCCESS_PACKET = 200L;
 
-    public PlayerPackCache(RespackSendPacketOut cachedPacket)
+    public static String removeHashtag(String url)
     {
-        this.cachedPacket = cachedPacket;
+        return url.split("#")[0];
     }
 
-    public boolean matches(RespackSendPacketOut packet,
-                           boolean checkHash,
-                           boolean checkForced,
-                           boolean checkMsg)
+    public static String removeHashtag(boolean remove, String url)
     {
-        return cachedPacket.equals(packet, checkHash, checkForced, checkMsg);
+        if(remove)
+            return url.split("#")[0];
+        return url;
+    }
+
+    @Nullable
+    public static String getUrlHashtag(String url)
+    {
+        final String[] split = url.split("#");
+        if(split.length == 2)
+            return split[1];
+        return null;
     }
 }
