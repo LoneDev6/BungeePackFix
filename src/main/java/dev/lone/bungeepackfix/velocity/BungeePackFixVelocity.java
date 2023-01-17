@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 @Plugin(
         id = "bungeepackfix",
         name = "BungeePackFix (Velocity)",
-        version = "1.1.0-r2",
+        version = "1.1.0-r3",
         description = "Avoid sending resourcepacks again if it's the same resourcepack. Useful when you switch servers.", authors = {"LoneDev", "YoSoyVillaa"}
 )
 public class BungeePackFixVelocity
@@ -57,15 +57,17 @@ public class BungeePackFixVelocity
     {
         try
         {
-            //TODO add metrics
-            this.settings = new Settings(dataDirectory);
+            this.settings = new Settings(dataDirectory, getClass().getClassLoader().getResourceAsStream("config.yml"));
             proxy.getEventManager().register(this, new ServerResourcePackSendListener(this));
         }
         catch (Throwable ex)
         {
             ex.printStackTrace();
             logger.error("Disabling plugin.");
+            return;
         }
+
+        //TODO add metrics
     }
 
     @Subscribe(order = PostOrder.NORMAL)

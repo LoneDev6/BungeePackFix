@@ -10,8 +10,11 @@ equal_pack_attributes:
 ignore_hash_in_url: true
 main_spigot_server_name: server_1
 ignored_servers:
-  - ignored_1
-  - ignored_2
+  enabled: true
+  invert_check: false
+  list:
+    - ignored_1
+    - ignored_2
 log:
   ignored_respack: false
   sent_respack: false

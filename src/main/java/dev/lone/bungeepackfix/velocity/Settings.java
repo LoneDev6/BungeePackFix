@@ -4,13 +4,14 @@ import dev.lone.bungeepackfix.generic.AbstractSettings;
 import net.kyori.adventure.text.Component;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 
 public class Settings extends AbstractSettings<Component>
 {
-    public Settings(Path dataDirectory) throws IOException
+    public Settings(Path dataDirectory, InputStream defaultConfigStream) throws IOException
     {
-        super(dataDirectory);
+        super(dataDirectory, defaultConfigStream);
     }
 
     @Override

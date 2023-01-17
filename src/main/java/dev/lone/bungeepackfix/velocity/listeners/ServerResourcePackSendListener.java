@@ -34,7 +34,7 @@ public class ServerResourcePackSendListener
         if (settings.log_debug)
             plugin.getLogger().warn("ServerResourcePackSendEvent: " + player.getUsername() + " " + readablePacket(serverPack));
 
-        if (settings.ignored_servers.contains(e.getServerConnection().getServerInfo().getName()))
+        if (settings.isIgnoredServer(e.getServerConnection().getServerInfo().getName()))
         {
             plugin.getLogger().warn("Skipping ignored server: " + player.getUsername() + " " + readablePacket(serverPack));
             return;

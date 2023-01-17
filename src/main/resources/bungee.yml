@@ -1,5 +1,5 @@
 name: BungeePackFix
-version: '1.1.0-r2'
+version: '1.1.0-r3'
 main: dev.lone.bungeepackfix.bungee.Main
 author: LoneDev
 description: Avoid sending resourcepacks again if it's the same resourcepack. Useful when you switch servers.

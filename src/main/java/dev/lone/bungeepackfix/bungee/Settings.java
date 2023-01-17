@@ -5,13 +5,14 @@ import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 
 public class Settings extends AbstractSettings<BaseComponent[]>
 {
-    public Settings(Path dataDirectory) throws IOException
+    public Settings(Path dataDirectory, InputStream defaultConfigStream) throws IOException
     {
-        super(dataDirectory);
+        super(dataDirectory, defaultConfigStream);
     }
 
     @Override

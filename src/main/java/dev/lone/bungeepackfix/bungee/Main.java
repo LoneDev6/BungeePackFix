@@ -33,7 +33,7 @@ public final class Main extends Plugin implements Listener
         adventure = BungeeAudiences.create(this);
         try
         {
-            settings = new Settings(this.getDataFolder().toPath());
+            settings = new Settings(this.getDataFolder().toPath(), getResourceAsStream("config.yml"));
         }
         catch (Throwable ex)
         {
@@ -144,7 +144,7 @@ public final class Main extends Plugin implements Listener
 
     private boolean isIgnoredServer(UserConnection conn)
     {
-        return (settings.ignored_servers.contains(conn.getServer().getInfo().getName()));
+        return settings.isIgnoredServer(conn.getServer().getInfo().getName());
     }
 
     /**

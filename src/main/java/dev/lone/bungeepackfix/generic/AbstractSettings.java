@@ -7,6 +7,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -20,6 +21,9 @@ public abstract class AbstractSettings<T>
 
     public boolean ignore_hash_in_url;
     public String main_server_name;
+
+    public boolean ignored_servers_enabled;
+    public boolean ignored_servers_invert_check;
     public List<String> ignored_servers;
 
     public boolean log_debug;
@@ -33,10 +37,10 @@ public abstract class AbstractSettings<T>
 
     protected YamlConfig config;
 
-    public AbstractSettings(Path dataDirectory) throws IOException
+    public AbstractSettings(Path dataDirectory, InputStream defaultConfigStream) throws IOException
     {
         config = new YamlConfig(new File(dataDirectory.toFile(), "config.yml").toPath());
-        config.load();
+        config.loadConfig(defaultConfigStream);
 
         equal_pack_attributes_hash = config.getBoolean("equal_pack_attributes.hash", true);
         equal_pack_attributes_forced = config.getBoolean("equal_pack_attributes.forced", true);
@@ -44,7 +48,10 @@ public abstract class AbstractSettings<T>
 
         ignore_hash_in_url = config.getBoolean("ignore_hash_in_url", true);
         main_server_name = config.getString("main_server_name", "server_1");
-        ignored_servers = config.getStringList("ignored_servers");
+
+        ignored_servers_enabled = config.getBoolean("ignored_servers.enabled");
+        ignored_servers_invert_check = config.getBoolean("ignored_servers.invert_check");
+        ignored_servers = config.getStringList("ignored_servers.list");
 
         log_debug = config.getBoolean("log.debug", false);
         log_ignored_respack = config.getBoolean("log.ignored_respack", false);
@@ -62,4 +69,13 @@ public abstract class AbstractSettings<T>
     }
 
     protected abstract void runPlatformDependentCode();
+
+    public boolean isIgnoredServer(String name)
+    {
+        if(!ignored_servers_enabled)
+            return false;
+        if(ignored_servers_invert_check)
+            return !(ignored_servers.contains(name));
+        return (ignored_servers.contains(name));
+    }
 }
