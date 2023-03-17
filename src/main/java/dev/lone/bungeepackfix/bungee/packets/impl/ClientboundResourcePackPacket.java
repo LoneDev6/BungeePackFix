@@ -42,6 +42,7 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19, 0x3A);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_1, 0x3D);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_3, 0x3C);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_4, 0x40);
         }catch (Exception ignored)
         {
             // Failed to find constant, probably Bungeecord is outdated.
