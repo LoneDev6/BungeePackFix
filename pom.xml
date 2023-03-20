@@ -6,7 +6,7 @@
 
     <groupId>BungeePackFix</groupId>
     <artifactId>BungeePackFix</artifactId>
-    <version>1.1.0-r3</version>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
 
     <name>BungeePackFix</name>
@@ -137,7 +137,7 @@
             <artifactId>Waterfall</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${jars_libs_folder}/bungee/waterfall.jar</systemPath>
+            <systemPath>${jars_libs_folder}/bungee/waterfall-1.19-515.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.velocitypowered</groupId>
