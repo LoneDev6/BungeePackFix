@@ -137,7 +137,7 @@
             <artifactId>Waterfall</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${jars_libs_folder}/bungee/waterfall-1.19-515.jar</systemPath>
+            <systemPath>${jars_libs_folder}/bungee/BungeeCord_2023_06_22.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.velocitypowered</groupId>

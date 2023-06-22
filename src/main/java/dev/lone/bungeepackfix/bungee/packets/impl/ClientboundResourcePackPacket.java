@@ -1,5 +1,6 @@
 package dev.lone.bungeepackfix.bungee.packets.impl;
 
+import dev.lone.bungeepackfix.bungee.Main;
 import dev.lone.bungeepackfix.bungee.packets.Packets;
 import dev.lone.bungeepackfix.bungee.packets.ClientboundPacket;
 import dev.lone.bungeepackfix.generic.PackUtility;
@@ -12,8 +13,7 @@ import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedHashMap;
-import java.util.Objects;
+import java.util.*;
 
 public class ClientboundResourcePackPacket extends ClientboundPacket
 {
@@ -24,6 +24,8 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
 
     //<editor-fold desc="Reflection initialization stuff">
     public static final LinkedHashMap<Integer, Integer> PACKET_MAP;
+    private static final String EXPECTED_LAST_SUPPORTED_VERSION = "1.20.x";
+
     static
     {
         PACKET_MAP = new LinkedHashMap<>();
@@ -43,9 +45,46 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_1, 0x3D);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_3, 0x3C);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_4, 0x40);
-        }catch (Exception ignored)
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_20, 0x40);
+        }
+        catch (Exception ignored)
         {
             // Failed to find constant, probably Bungeecord is outdated.
+        }
+
+        try
+        {
+            tryInitializingNextReleases();
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    private static void tryInitializingNextReleases()
+    {
+        int bungeeVersionsCount = ProtocolConstants.SUPPORTED_VERSIONS.size();
+        String bungeeLastSupportedVersion = ProtocolConstants.SUPPORTED_VERSIONS.get(bungeeVersionsCount - 1);
+        if (bungeeLastSupportedVersion.equals(EXPECTED_LAST_SUPPORTED_VERSION))
+        {
+            int lastSupportedVersionId = (Integer) PACKET_MAP.entrySet().toArray()[PACKET_MAP.size() - 1];
+            int lastKnownPacketId = PACKET_MAP.get(lastSupportedVersionId);
+
+            int lastSupportedVersionIdIndex = ProtocolConstants.SUPPORTED_VERSION_IDS.indexOf(lastSupportedVersionId) + 1;
+
+            for (int i = lastSupportedVersionIdIndex + 1; i < ProtocolConstants.SUPPORTED_VERSION_IDS.size(); i++)
+            {
+                Main.logger.warning("This Bungeecord version is not officially supported. Now trying to load it anyway.");
+
+                // Put the next known packet ID into the map by providing the last known version ID
+                // from this Bungeecord installation.
+                PACKET_MAP.put(ProtocolConstants.SUPPORTED_VERSION_IDS.get(i), lastKnownPacketId);
+            }
+        }
+        else
+        {
+            Main.logger.severe("This Bungeecord version is not supported. Will be supported in the future.");
         }
     }
     //</editor-fold>
