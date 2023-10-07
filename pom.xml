@@ -99,12 +99,12 @@
                             <shadedPattern>dev.lone.shaded.bungeepackfix.org.yaml</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>net.kyori.adventure.text.serializer.bungeecord.</pattern>
-                            <shadedPattern>dev.lone.shaded.bungeepackfix.net.kyori.adventure.text.serializer.bungeecord</shadedPattern>
+                            <pattern>net.kyori</pattern>
+                            <shadedPattern>dev.lone.shaded.bungeepackfix.net.kyori</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>net.kyori.adventure.text.minimessage.</pattern>
-                            <shadedPattern>dev.lone.shaded.bungeepackfix.net.kyori.adventure.text.minimessage</shadedPattern>
+                            <pattern>org.intellij</pattern>
+                            <shadedPattern>dev.lone.shaded.org.intellij</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
