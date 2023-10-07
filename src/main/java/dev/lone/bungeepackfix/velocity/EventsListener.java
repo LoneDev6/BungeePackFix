@@ -1,4 +1,4 @@
-package dev.lone.bungeepackfix.velocity.listeners;
+package dev.lone.bungeepackfix.velocity;
 
 import com.google.common.io.BaseEncoding;
 import com.velocitypowered.api.event.PostOrder;
@@ -10,16 +10,13 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.player.ResourcePackInfo;
 import dev.lone.bungeepackfix.generic.PackUtility;
-import dev.lone.bungeepackfix.velocity.BungeePackFixVelocity;
-import dev.lone.bungeepackfix.velocity.Settings;
-import dev.lone.bungeepackfix.velocity.VelocityPlayerPackCache;
 
-public class ServerResourcePackSendListener
+public class EventsListener
 {
-    private final BungeePackFixVelocity plugin;
+    private final Main plugin;
     private final Settings settings;
 
-    public ServerResourcePackSendListener(BungeePackFixVelocity plugin)
+    public EventsListener(Main plugin)
     {
         this.plugin = plugin;
         this.settings = plugin.settings;
@@ -49,7 +46,7 @@ public class ServerResourcePackSendListener
 
         final ResourcePackInfo playerPack = player.getAppliedResourcePack();
 
-        if (VelocityPlayerPackCache.isSamePack(
+        if (PlayersPackCache.isSamePack(
                 settings,
                 e.getServerConnection(),
                 playerPack,

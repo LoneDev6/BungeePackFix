@@ -17,7 +17,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package dev.lone.bungeepackfix.bungee;
+package dev.lone.bungeepackfix.generic;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -72,7 +72,7 @@ public class Metrics {
      *
      * @param plugin Your plugin instance.
      * @param serviceId The id of the service. It can be found at <a
-     *     href="https://bstats.org/what-is-my-plugin-id">What is my plugin id?</a>
+     *     href="https://pStats.org/what-is-my-plugin-id">What is my plugin id?</a>
      */
     public Metrics(Plugin plugin, int serviceId) {
         this.plugin = plugin;
@@ -80,7 +80,7 @@ public class Metrics {
             loadConfig();
         } catch (IOException e) {
             // Failed to load configuration
-            plugin.getLogger().log(Level.WARNING, "Failed to load bStats config!", e);
+            plugin.getLogger().log(Level.WARNING, "Failed to load pStats config!", e);
             metricsBase = null;
             return;
         }
@@ -101,18 +101,18 @@ public class Metrics {
                         logResponseStatusText);
     }
 
-    /** Loads the bStats configuration. */
+    /** Loads the pStats configuration. */
     private void loadConfig() throws IOException {
-        File bStatsFolder = new File(plugin.getDataFolder().getParentFile(), "bStats");
-        bStatsFolder.mkdirs();
-        File configFile = new File(bStatsFolder, "config.yml");
+        File pStatsFolder = new File(plugin.getDataFolder().getParentFile(), "pStats");
+        pStatsFolder.mkdirs();
+        File configFile = new File(pStatsFolder, "config.yml");
         if (!configFile.exists()) {
             writeFile(
                     configFile,
-                    "# bStats (https://bStats.org) collects some basic information for plugin authors, like how",
-                    "# many people use their plugin and their total player count. It's recommended to keep bStats",
+                    "# pStats (https://pStats.org) collects some basic information for plugin authors, like how",
+                    "# many people use their plugin and their total player count. It's recommended to keep pStats",
                     "# enabled, but if you're not comfortable with this, you can turn this setting off. There is no",
-                    "# performance penalty associated with having metrics enabled, and data sent to bStats is fully",
+                    "# performance penalty associated with having metrics enabled, and data sent to pStats is fully",
                     "# anonymous.",
                     "enabled: true",
                     "serverUuid: \"" + UUID.randomUUID() + "\"",
@@ -170,9 +170,9 @@ public class Metrics {
         public static final String METRICS_VERSION = "2.2.1";
 
         private static final ScheduledExecutorService scheduler =
-                Executors.newScheduledThreadPool(1, task -> new Thread(task, "bStats-Metrics"));
+                Executors.newScheduledThreadPool(1, task -> new Thread(task, "pStats-Metrics"));
 
-        private static final String REPORT_URL = "https://bStats.org/api/v2/data/%s";
+        private static final String REPORT_URL = "https://ps.org/api/v2/data/%s";
 
         private final String platform;
 
@@ -276,11 +276,11 @@ public class Metrics {
                     };
             // Many servers tend to restart at a fixed time at xx:00 which causes an uneven distribution
             // of requests on the
-            // bStats backend. To circumvent this problem, we introduce some randomness into the initial
+            // pStats backend. To circumvent this problem, we introduce some randomness into the initial
             // and second delay.
             // WARNING: You must not modify and part of this Metrics class, including the submit delay or
             // frequency!
-            // WARNING: Modifying this code will get your plugin banned on bStats. Just don't do it!
+            // WARNING: Modifying this code will get your plugin banned on pStats. Just don't do it!
             long initialDelay = (long) (1000 * 60 * (3 + Math.random() * 3));
             long secondDelay = (long) (1000 * 60 * (Math.random() * 30));
             scheduler.schedule(submitTask, initialDelay, TimeUnit.MILLISECONDS);
@@ -312,7 +312,7 @@ public class Metrics {
                         } catch (Exception e) {
                             // Something went wrong! :(
                             if (logErrors) {
-                                errorLogger.accept("Could not submit bStats metrics data", e);
+                                errorLogger.accept("Could not submit pStats metrics data", e);
                             }
                         }
                     });
@@ -320,7 +320,7 @@ public class Metrics {
 
         private void sendData(JsonObjectBuilder.JsonObject data) throws Exception {
             if (logSentData) {
-                infoLogger.accept("Sent bStats metrics data: " + data.toString());
+                infoLogger.accept("Sent pStats metrics data: " + data.toString());
             }
             String url = String.format(REPORT_URL, platform);
             HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
@@ -346,15 +346,15 @@ public class Metrics {
                 }
             }
             if (logResponseStatusText) {
-                infoLogger.accept("Sent data to bStats and received response: " + builder);
+                infoLogger.accept("Sent data to pStats and received response: " + builder);
             }
         }
 
         /** Checks that the class was properly relocated. */
         private void checkRelocation() {
             // You can use the property to disable the check in your test environment
-            if (System.getProperty("bstats.relocatecheck") == null
-                    || !System.getProperty("bstats.relocatecheck").equals("false")) {
+            if (System.getProperty("pStats.relocatecheck") == null
+                    || !System.getProperty("pStats.relocatecheck").equals("false")) {
                 // Maven's Relocate is clever and changes strings, too. So we have to use this little
                 // "trick" ... :D
                 final String defaultPackage =
@@ -365,7 +365,7 @@ public class Metrics {
                 // names
                 if (MetricsBase.class.getPackage().getName().startsWith(defaultPackage)
                         || MetricsBase.class.getPackage().getName().startsWith(examplePackage)) {
-                    throw new IllegalStateException("bStats Metrics class has not been relocated correctly!");
+                    throw new IllegalStateException("pStats Metrics class has not been relocated correctly!");
                 }
             }
         }

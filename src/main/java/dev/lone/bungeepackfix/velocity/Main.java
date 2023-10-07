@@ -8,7 +8,6 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import dev.lone.bungeepackfix.velocity.listeners.ServerResourcePackSendListener;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -20,7 +19,7 @@ import java.util.concurrent.TimeUnit;
         version = "1.1.0-r3",
         description = "Avoid sending resourcepacks again if it's the same resourcepack. Useful when you switch servers.", authors = {"LoneDev", "YoSoyVillaa"}
 )
-public class BungeePackFixVelocity
+public class Main
 {
     private final Path dataDirectory;
     private final Logger logger;
@@ -28,7 +27,7 @@ public class BungeePackFixVelocity
     public Settings settings;
 
     @Inject
-    public BungeePackFixVelocity(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger)
+    public Main(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger)
     {
         this.proxy = proxy;
         this.dataDirectory = dataDirectory;
@@ -58,7 +57,7 @@ public class BungeePackFixVelocity
         try
         {
             this.settings = new Settings(dataDirectory, getClass().getClassLoader().getResourceAsStream("config.yml"));
-            proxy.getEventManager().register(this, new ServerResourcePackSendListener(this));
+            proxy.getEventManager().register(this, new EventsListener(this));
         }
         catch (Throwable ex)
         {
@@ -73,6 +72,6 @@ public class BungeePackFixVelocity
     @Subscribe(order = PostOrder.NORMAL)
     public void onPlayerDisconnect(DisconnectEvent e)
     {
-        VelocityPlayerPackCache.playersCache.remove(e.getPlayer().getUniqueId());
+        PlayersPackCache.playersCache.remove(e.getPlayer().getUniqueId());
     }
 }

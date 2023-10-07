@@ -2,16 +2,16 @@ package dev.lone.bungeepackfix.velocity;
 
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.player.ResourcePackInfo;
-import dev.lone.bungeepackfix.generic.AbstractPlayerPackCache;
+import dev.lone.bungeepackfix.generic.AbstractPlayersPackCache;
 import dev.lone.bungeepackfix.generic.PackUtility;
 
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
-public class VelocityPlayerPackCache extends AbstractPlayerPackCache
+public class PlayersPackCache extends AbstractPlayersPackCache
 {
-    public static HashMap<UUID, VelocityPlayerPackCache> playersCache = new HashMap<>();
+    public static HashMap<UUID, PlayersPackCache> playersCache = new HashMap<>();
 
     public static boolean isSamePack(Settings settings,
                                      ServerConnection connection,
@@ -31,7 +31,7 @@ public class VelocityPlayerPackCache extends AbstractPlayerPackCache
         if (connection.getServerInfo().getName().equals(settings.main_server_name))
         {
             String urlHashtag = PackUtility.getUrlHashtag(newPack.getUrl());
-            VelocityPlayerPackCache playerCache = playersCache.get(connection.getPlayer().getUniqueId());
+            PlayersPackCache playerCache = playersCache.get(connection.getPlayer().getUniqueId());
             if (playerCache != null)
             {
                 // Check if the hashtag in main server URL changed
@@ -43,7 +43,7 @@ public class VelocityPlayerPackCache extends AbstractPlayerPackCache
             }
             else
             {
-                playerCache = new VelocityPlayerPackCache();
+                playerCache = new PlayersPackCache();
                 playersCache.put(connection.getPlayer().getUniqueId(), playerCache);
             }
 

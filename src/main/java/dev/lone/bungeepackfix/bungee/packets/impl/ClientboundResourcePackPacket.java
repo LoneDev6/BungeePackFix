@@ -1,8 +1,8 @@
 package dev.lone.bungeepackfix.bungee.packets.impl;
 
-import dev.lone.bungeepackfix.bungee.Main;
-import dev.lone.bungeepackfix.bungee.packets.Packets;
 import dev.lone.bungeepackfix.bungee.packets.ClientboundPacket;
+import dev.lone.bungeepackfix.bungee.packets.Packet;
+import dev.lone.bungeepackfix.bungee.packets.Packets;
 import dev.lone.bungeepackfix.generic.PackUtility;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -10,10 +10,12 @@ import net.md_5.bungee.connection.DownstreamBridge;
 import net.md_5.bungee.netty.PacketHandler;
 import net.md_5.bungee.protocol.AbstractPacketHandler;
 import net.md_5.bungee.protocol.PacketWrapper;
+import net.md_5.bungee.protocol.Protocol;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Objects;
 
 public class ClientboundResourcePackPacket extends ClientboundPacket
 {
@@ -23,13 +25,10 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
     public String promptMessage;
 
     //<editor-fold desc="Reflection initialization stuff">
-    public static final LinkedHashMap<Integer, Integer> PACKET_MAP;
-    private static final String EXPECTED_LAST_SUPPORTED_VERSION = "1.20.x";
-
+    private static final LinkedHashMap<Integer, Integer> PACKET_MAP;
     static
     {
         PACKET_MAP = new LinkedHashMap<>();
-
         try
         {
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_8, 0x48);
@@ -45,46 +44,11 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_1, 0x3D);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_3, 0x3C);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_4, 0x40);
-            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_20, 0x40);
+            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_20_2, 0x06);
         }
         catch (Exception ignored)
         {
             // Failed to find constant, probably Bungeecord is outdated.
-        }
-
-        try
-        {
-            tryInitializingNextReleases();
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
-    private static void tryInitializingNextReleases()
-    {
-        int bungeeVersionsCount = ProtocolConstants.SUPPORTED_VERSIONS.size();
-        String bungeeLastSupportedVersion = ProtocolConstants.SUPPORTED_VERSIONS.get(bungeeVersionsCount - 1);
-        if (bungeeLastSupportedVersion.equals(EXPECTED_LAST_SUPPORTED_VERSION))
-        {
-            int lastSupportedVersionId = (Integer) PACKET_MAP.entrySet().toArray()[PACKET_MAP.size() - 1];
-            int lastKnownPacketId = PACKET_MAP.get(lastSupportedVersionId);
-
-            int lastSupportedVersionIdIndex = ProtocolConstants.SUPPORTED_VERSION_IDS.indexOf(lastSupportedVersionId) + 1;
-
-            for (int i = lastSupportedVersionIdIndex + 1; i < ProtocolConstants.SUPPORTED_VERSION_IDS.size(); i++)
-            {
-                Main.logger.warning("This Bungeecord version is not officially supported. Now trying to load it anyway.");
-
-                // Put the next known packet ID into the map by providing the last known version ID
-                // from this Bungeecord installation.
-                PACKET_MAP.put(ProtocolConstants.SUPPORTED_VERSION_IDS.get(i), lastKnownPacketId);
-            }
-        }
-        else
-        {
-            Main.logger.severe("This Bungeecord version is not supported. Will be supported in the future.");
         }
     }
     //</editor-fold>
@@ -118,12 +82,12 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
     @Override
     public void handle(final AbstractPacketHandler handler) throws Exception
     {
-        final PacketWrapper wrapper = new PacketWrapper(this, Unpooled.EMPTY_BUFFER);
+        PacketWrapper wrapper = Packet.newPacketWrapper(this, Unpooled.EMPTY_BUFFER, Protocol.STATUS);
         if (handler instanceof DownstreamBridge)
         {
             Packets.runHandlers(wrapper, Packets.getUserConnection((DownstreamBridge) handler));
         }
-        else // Sending "resourcepack apply" packet to the server? wtf
+        else // Sending "resourcepack apply" packet to the server? wtf, should I warn about that?
         {
             if (handler instanceof PacketHandler)
                 ((PacketHandler) handler).handle(wrapper);

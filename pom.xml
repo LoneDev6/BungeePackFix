@@ -6,7 +6,7 @@
 
     <groupId>BungeePackFix</groupId>
     <artifactId>BungeePackFix</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.3</version>
     <packaging>jar</packaging>
 
     <name>BungeePackFix</name>
@@ -15,11 +15,24 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jars_libs_folder>C:/Progetti/Minecraft/Spigot/_jars</jars_libs_folder>
+        <output.dir>C:/Progetti/Minecraft/TestServer/proxy/waterfall_1_25577/plugins</output.dir>
     </properties>
 
     <build>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <finalName>BungeePackFix</finalName>
+                    <outputDirectory>${output.dir}</outputDirectory>
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -137,7 +150,7 @@
             <artifactId>Waterfall</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${jars_libs_folder}/bungee/BungeeCord_2023_06_22.jar</systemPath>
+            <systemPath>${jars_libs_folder}/bungee/BungeeCord_2023_10_06.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.velocitypowered</groupId>

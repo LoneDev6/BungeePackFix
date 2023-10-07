@@ -2,6 +2,7 @@
 
 package dev.lone.bungeepackfix.bungee.packets.impl;
 
+import dev.lone.bungeepackfix.bungee.packets.Packet;
 import dev.lone.bungeepackfix.bungee.packets.Packets;
 import dev.lone.bungeepackfix.bungee.packets.ServerboundPacket;
 import io.netty.buffer.ByteBuf;
@@ -10,6 +11,7 @@ import net.md_5.bungee.connection.UpstreamBridge;
 import net.md_5.bungee.netty.PacketHandler;
 import net.md_5.bungee.protocol.AbstractPacketHandler;
 import net.md_5.bungee.protocol.PacketWrapper;
+import net.md_5.bungee.protocol.Protocol;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
 import java.util.LinkedHashMap;
@@ -20,11 +22,10 @@ public class ServerboundResourcePackPacket extends ServerboundPacket
     public int status;
 
     //<editor-fold desc="Reflection initialization stuff">
-    public static final LinkedHashMap<Integer, Integer> PACKET_MAP;
+    private static final LinkedHashMap<Integer, Integer> PACKET_MAP;
     static
     {
         PACKET_MAP = new LinkedHashMap<>();
-
         try
         {
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_8, 0x19);
@@ -35,7 +36,8 @@ public class ServerboundResourcePackPacket extends ServerboundPacket
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_16, 0x21);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19, 0x23);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_1, 0x24);
-        }catch (Exception ignored)
+        }
+        catch (Exception ignored)
         {
             // Failed to find constant, probably Bungeecord is outdated.
         }
@@ -68,7 +70,7 @@ public class ServerboundResourcePackPacket extends ServerboundPacket
     @Override
     public void handle(final AbstractPacketHandler handler) throws Exception
     {
-        final PacketWrapper wrapper = new PacketWrapper(this, Unpooled.EMPTY_BUFFER);
+        PacketWrapper wrapper = Packet.newPacketWrapper(this, Unpooled.EMPTY_BUFFER, Protocol.STATUS);
         if (handler instanceof UpstreamBridge)
         {
             Packets.runHandlers(wrapper, Packets.getUserConnection((UpstreamBridge) handler));

@@ -1,15 +1,15 @@
 package dev.lone.bungeepackfix.bungee;
 
 import dev.lone.bungeepackfix.bungee.packets.impl.ClientboundResourcePackPacket;
-import dev.lone.bungeepackfix.generic.AbstractPlayerPackCache;
+import dev.lone.bungeepackfix.generic.AbstractPlayersPackCache;
 import net.md_5.bungee.UserConnection;
 
-public class BungeePlayerPackCache extends AbstractPlayerPackCache
+public class PlayersPackCache extends AbstractPlayersPackCache
 {
     public ClientboundResourcePackPacket cachedPacket;
     public boolean installedSuccessfully;
 
-    public BungeePlayerPackCache(ClientboundResourcePackPacket cachedPacket)
+    public PlayersPackCache(ClientboundResourcePackPacket cachedPacket)
     {
         this.cachedPacket = cachedPacket;
     }
