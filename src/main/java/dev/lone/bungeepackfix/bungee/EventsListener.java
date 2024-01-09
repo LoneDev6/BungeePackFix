@@ -2,6 +2,7 @@ package dev.lone.bungeepackfix.bungee;
 
 import dev.lone.bungeepackfix.bungee.packets.Packets;
 import dev.lone.bungeepackfix.bungee.packets.impl.ClientboundResourcePackPacket;
+import dev.lone.bungeepackfix.bungee.packets.impl.ClientboundResourcePackPopPacket;
 import dev.lone.bungeepackfix.bungee.packets.impl.ServerboundResourcePackPacket;
 import dev.lone.bungeepackfix.generic.PackUtility;
 import net.md_5.bungee.UserConnection;
@@ -83,6 +84,11 @@ public class EventsListener implements Listener
                 playersCache.remove(conn.getUniqueId());
             }
             return false;
+        });
+
+        ClientboundResourcePackPopPacket.register();
+        Packets.registerHandler(ClientboundResourcePackPopPacket.class, (packet, conn) -> {
+            return Main.inst().settings.cancel_modern_resourcepack_remove_packet;
         });
     }
 

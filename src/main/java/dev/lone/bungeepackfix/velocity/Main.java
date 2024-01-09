@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 @Plugin(
         id = "bungeepackfix",
         name = "BungeePackFix (Velocity)",
-        version = "1.1.4",
+        version = "1.1.5-beta-1",
         description = "Avoid sending resourcepacks again if it's the same resourcepack. Useful when you switch servers.", authors = {"LoneDev", "YoSoyVillaa"}
 )
 public class Main

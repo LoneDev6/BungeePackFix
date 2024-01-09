@@ -1,30 +1,35 @@
 package dev.lone.bungeepackfix.bungee.packets.impl;
 
+import dev.lone.bungeepackfix.bungee.Main;
+import dev.lone.bungeepackfix.bungee.Settings;
 import dev.lone.bungeepackfix.bungee.packets.ClientboundPacket;
 import dev.lone.bungeepackfix.bungee.packets.Packet;
 import dev.lone.bungeepackfix.bungee.packets.Packets;
 import dev.lone.bungeepackfix.generic.PackUtility;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.connection.DownstreamBridge;
 import net.md_5.bungee.netty.PacketHandler;
-import net.md_5.bungee.protocol.AbstractPacketHandler;
-import net.md_5.bungee.protocol.PacketWrapper;
-import net.md_5.bungee.protocol.Protocol;
-import net.md_5.bungee.protocol.ProtocolConstants;
+import net.md_5.bungee.protocol.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.UUID;
 
+// https://mappings.cephx.dev/1.20.2/net/minecraft/network/protocol/common/ClientboundResourcePackPacket.html
+// https://mappings.cephx.dev/1.20.3/net/minecraft/network/protocol/common/ClientboundResourcePackPushPacket.html
 public class ClientboundResourcePackPacket extends ClientboundPacket
 {
+    public UUID id = UUID.nameUUIDFromBytes("".getBytes()); // 1.20.4+
     public String url;
     public String hash;
-    public boolean forced;
-    public String promptMessage;
+    public boolean required;
+    public Object promptMessage;
 
     //<editor-fold desc="Reflection initialization stuff">
+    // https://github.com/dmulloy2/ProtocolLib/commits/master/src/main/java/com/comphenix/protocol/PacketType.java
     private static final LinkedHashMap<Integer, Integer> PACKET_MAP;
     static
     {
@@ -44,7 +49,7 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_1, 0x3D);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_3, 0x3C);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_4, 0x40);
-            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_20_2, 0x06);
+            PACKET_MAP.put(Packet.versionIdByName("MINECRAFT_1_20_3"), 0x44);
         }
         catch (Exception ignored)
         {
@@ -64,17 +69,12 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
         );
     }
 
-    public ClientboundResourcePackPacket(final String url, final String hash)
+    // 1.20.4+
+    public ClientboundResourcePackPacket(final UUID id, final String url, final String hash)
     {
+        this.id = id != null ? id : UUID.nameUUIDFromBytes("".getBytes());
         this.url = url;
         this.hash = hash;
-    }
-
-    public ClientboundResourcePackPacket(final String url, final String hash, final boolean forced, final String promptMessage)
-    {
-        this(url, hash);
-        this.forced = forced;
-        this.promptMessage = promptMessage;
     }
 
     public ClientboundResourcePackPacket() {}
@@ -97,10 +97,12 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
     @Override
     public void read(final ByteBuf buf)
     {
+        // WARNING: this doesn't take 1.20.3+ uuid field into account!
+        // I'm not even sure this is actually called.
         this.url = readString(buf);
         try
         {
-            this.hash = readString(buf);
+            this.hash = readString(buf, 40);
         }
         catch (IndexOutOfBoundsException ignored)
         {
@@ -111,19 +113,29 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
     @Override
     public void read(final ByteBuf buf, final ProtocolConstants.Direction direction, final int clientVersion)
     {
+        if (Packets.is1_20_3OrGreater(clientVersion))
+            id = readUUID(buf);
+
         read(buf);
         if (clientVersion >= ProtocolConstants.MINECRAFT_1_17)
         {
-            forced = buf.readBoolean();
+            required = buf.readBoolean();
             final boolean hasPromptMessage = buf.readBoolean();
             if (hasPromptMessage)
-                promptMessage = readString(buf);
+            {
+                if(hasRwComponent)
+                    promptMessage = readBaseComponent(buf, clientVersion);
+                else
+                    promptMessage = readString(buf); // Idk if this shit works.
+            }
         }
     }
 
     @Override
     public void write(final ByteBuf buf)
     {
+        // WARNING: this doesn't take 1.20.3+ uuid field into account!
+        // I'm not even sure this is actually called.
         writeString(url, buf);
         writeString(hash == null ? "" : hash, buf);
     }
@@ -131,14 +143,19 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
     @Override
     public void write(final ByteBuf buf, final ProtocolConstants.Direction direction, final int clientVersion)
     {
+        if (Packets.is1_20_3OrGreater(clientVersion))
+            writeUUID(id, buf);
         this.write(buf);
         if (clientVersion >= ProtocolConstants.MINECRAFT_1_17)
         {
-            buf.writeBoolean(this.forced);
+            buf.writeBoolean(this.required);
             if (this.promptMessage != null)
             {
                 buf.writeBoolean(true);
-                writeString(this.promptMessage, buf);
+                if(hasRwComponent)
+                    writeBaseComponent((BaseComponent) this.promptMessage, buf, clientVersion);
+                else
+                    writeString((String) this.promptMessage, buf);
             }
             else
             {
@@ -147,17 +164,12 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
         }
     }
 
-    @Nullable
     public String getUrlHashtag()
     {
         return PackUtility.getUrlHashtag(url);
     }
 
-    public boolean isSamePack(ClientboundResourcePackPacket newPack,
-                              boolean ignoreHashtagInUrl,
-                              boolean checkHash,
-                              boolean checkForced,
-                              boolean checkMsg)
+    public boolean isSamePack(ClientboundResourcePackPacket newPack)
     {
         if (this == newPack)
             return true;
@@ -165,13 +177,15 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
         if (newPack == null || this.getClass() != newPack.getClass())
             return false;
 
-        final String newUrl = PackUtility.removeHashtag(ignoreHashtagInUrl, newPack.url);
-        final String prevUrl = PackUtility.removeHashtag(ignoreHashtagInUrl, this.url);
+        Settings settings = Main.inst().settings;
+        final String newUrl = PackUtility.removeHashtag(settings.ignore_hash_in_url, newPack.url);
+        final String prevUrl = PackUtility.removeHashtag(settings.ignore_hash_in_url, this.url);
 
-        return (Objects.equals(prevUrl, newUrl)) &&
-                (!checkHash || Objects.equals(this.hash, newPack.hash)) &&
-                (!checkForced || Objects.equals(this.forced, newPack.forced)) &&
-                (!checkMsg || Objects.equals(this.promptMessage, newPack.promptMessage))
+        return (!settings.equal_pack_attribute_modern_uuid || Objects.equals(this.id, newPack.id)) &&
+                Objects.equals(prevUrl, newUrl) &&
+                (!settings.equal_pack_attributes_hash || Objects.equals(this.hash, newPack.hash)) &&
+                (!settings.equal_pack_attributes_forced || Objects.equals(this.required, newPack.required)) &&
+                (!settings.equal_pack_attributes_prompt_message || Objects.equals(this.promptMessage, newPack.promptMessage))
                 ;
     }
 
@@ -185,9 +199,10 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
             return false;
 
         final ClientboundResourcePackPacket thisNut = (ClientboundResourcePackPacket) o;
-        return Objects.equals(this.url, thisNut.url) &&
+        return Objects.equals(this.id, thisNut.id) &&
+                Objects.equals(this.url, thisNut.url) &&
                 Objects.equals(this.hash, thisNut.hash) &&
-                Objects.equals(this.forced, thisNut.forced) &&
+                Objects.equals(this.required, thisNut.required) &&
                 Objects.equals(this.promptMessage, thisNut.promptMessage)
                 ;
     }
@@ -195,12 +210,12 @@ public class ClientboundResourcePackPacket extends ClientboundPacket
     @Override
     public int hashCode()
     {
-        return Objects.hash(this.url, this.hash, this.forced, this.promptMessage);
+        return Objects.hash(this.url, this.hash, this.required, this.promptMessage);
     }
 
     @Override
     public String toString()
     {
-        return "ClientboundResourcePackPacket{url='" + this.url + '\'' + ", hash=" + this.hash + ", forced=" + this.forced + ", promptMessage=" + this.promptMessage + '}';
+        return "ClientboundResourcePackPacket{id=" + id + ", url='" + this.url + '\'' + ", hash=" + this.hash + ", forced=" + this.required + ", promptMessage=" + this.promptMessage + '}';
     }
 }

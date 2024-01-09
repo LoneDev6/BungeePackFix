@@ -86,6 +86,12 @@ public class Packets
     }
     //</editor-fold>
 
+    public static boolean is1_20_3OrGreater(int clientVersion)
+    {
+        //https://wiki.vg/Protocol_version_numbers
+        return clientVersion == 765;
+    }
+
     /**
      * Obtain the ChannelWrapper instance from a ServerConnectedEvent.
      * @param e The event when the player connects to a server.

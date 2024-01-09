@@ -6,7 +6,7 @@
 
     <groupId>BungeePackFix</groupId>
     <artifactId>BungeePackFix</artifactId>
-    <version>1.1.3</version>
+    <version>1.1.5</version>
     <packaging>jar</packaging>
 
     <name>BungeePackFix</name>
@@ -61,7 +61,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0-SNAPSHOT</version>
+                <version>3.5.1</version>
                 <configuration>
                     <minimizeJar>true</minimizeJar> <!-- Used to remove unused libs code from the "includes" list -->
                     <filters>
@@ -83,8 +83,12 @@
                     <relocations>
                         <!-- Shade libs -->
                         <relocation>
-                            <pattern>net.skinsrestorer</pattern>
-                            <shadedPattern>dev.lone.shaded.bungeepackfix.net.skinsrestorer</shadedPattern>
+                            <pattern>org.yaml</pattern>
+                            <shadedPattern>dev.lone.shaded.bungeepackfix.org.yaml</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.intellij</pattern>
+                            <shadedPattern>dev.lone.shaded.org.intellij</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.jetbrains</pattern>
@@ -102,6 +106,7 @@
                             <pattern>org.intellij</pattern>
                             <shadedPattern>dev.lone.shaded.org.intellij</shadedPattern>
                         </relocation>
+
                         <!-- Shading the adventure lib bungeecord compatibility -->
                         <relocation>
                             <pattern>net.kyori.adventure.text.serializer.bungeecord.</pattern>
@@ -159,13 +164,13 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>23.1.0</version>
+            <version>24.1.0</version>
         </dependency>
         <!-- To avoid including it in the jar -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.0</version>
+            <version>2.10.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -173,7 +178,7 @@
             <artifactId>Waterfall</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${jars_libs_folder}/bungee/BungeeCord_2023_10_06.jar</systemPath>
+            <systemPath>${jars_libs_folder}/bungee/waterfall-1.20.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.velocitypowered</groupId>
@@ -183,14 +188,21 @@
         </dependency>
 
         <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.30</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.SkinsRestorer</groupId>
             <artifactId>axiom</artifactId>
             <version>main-aa9a31fe25-1</version>
         </dependency>
+
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-minimessage</artifactId>
-            <version>4.14.0</version>
+            <version>4.15.0</version>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>

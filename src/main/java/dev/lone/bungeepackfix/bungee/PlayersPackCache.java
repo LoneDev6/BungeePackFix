@@ -33,12 +33,6 @@ public class PlayersPackCache extends AbstractPlayersPackCache
             mainServerUrlHashtag = urlHashtag;
         }
 
-        return cachedPacket.isSamePack(
-                packet,
-                settings.ignore_hash_in_url,
-                settings.equal_pack_attributes_hash,
-                settings.equal_pack_attributes_forced,
-                settings.equal_pack_attributes_prompt_message
-        );
+        return cachedPacket.isSamePack(packet);
     }
 }

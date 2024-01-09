@@ -71,6 +71,8 @@ public class EventsListener
             plugin.getLogger().warn("Sending pack: " + player.getUsername() + " " + readablePacket(serverPack));
     }
 
+    // TODO: implement "cancel_modern_resourcepack_remove_packet" functionality also for Velocity.
+
     private String readablePacket(ResourcePackInfo pack)
     {
         return "ResourcePackInfo{url='" + pack.getUrl() + '\'' + ", hash=" + hashToString(pack.getHash()) + ", forced=" + pack.getShouldForce() + ", promptMessage=" + pack.getPrompt() + '}';

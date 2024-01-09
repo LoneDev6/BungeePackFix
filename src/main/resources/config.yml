@@ -4,10 +4,12 @@ messages:
     enabled: true
     message: "&6Skipped resourcepack installation (you already loaded it)."
 equal_pack_attributes:
+  modern_uuid: true
   hash: true
   forced: true
   prompt_message: true
 ignore_hash_in_url: true
+cancel_modern_resourcepack_remove_packet: true
 main_spigot_server_name: server_1
 ignored_servers:
   enabled: true

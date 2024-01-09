@@ -16,12 +16,17 @@ import net.md_5.bungee.protocol.ProtocolConstants;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.UUID;
 
+// https://mappings.cephx.dev/1.20.2/net/minecraft/network/protocol/common/ServerboundResourcePackPacket.html
+// https://mappings.cephx.dev/1.20.3/net/minecraft/network/protocol/common/ServerboundResourcePackPacket.html
 public class ServerboundResourcePackPacket extends ServerboundPacket
 {
+    public UUID id = UUID.nameUUIDFromBytes("".getBytes()); // 1.20.4+
     public int status;
 
     //<editor-fold desc="Reflection initialization stuff">
+    // https://github.com/dmulloy2/ProtocolLib/commits/master/src/main/java/com/comphenix/protocol/PacketType.java
     private static final LinkedHashMap<Integer, Integer> PACKET_MAP;
     static
     {
@@ -35,7 +40,7 @@ public class ServerboundResourcePackPacket extends ServerboundPacket
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_14, 0x1F);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_16, 0x21);
             PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19, 0x23);
-            PACKET_MAP.put(ProtocolConstants.MINECRAFT_1_19_1, 0x24);
+            PACKET_MAP.put(Packet.versionIdByName("MINECRAFT_1_20_3"), 0x28);
         }
         catch (Exception ignored)
         {
@@ -55,16 +60,28 @@ public class ServerboundResourcePackPacket extends ServerboundPacket
         );
     }
 
+    public ServerboundResourcePackPacket(final UUID id, final int status)
+    {
+        this.id = id != null ? id : UUID.nameUUIDFromBytes("".getBytes());
+        this.status = status;
+    }
+
     public ServerboundResourcePackPacket(int status)
     {
-        this.status = status;
+        this(null, status);
     }
 
     public ServerboundResourcePackPacket() {}
 
+    public ServerboundResourcePackPacket(final UUID id, Status status)
+    {
+        this.id = id != null ? id : UUID.nameUUIDFromBytes("".getBytes());
+        this.status = status.ordinal();
+    }
+
     public ServerboundResourcePackPacket(Status status)
     {
-        this.status = status.ordinal();
+        this(null, status);
     }
 
     @Override
@@ -85,24 +102,32 @@ public class ServerboundResourcePackPacket extends ServerboundPacket
     @Override
     public void read(final ByteBuf buf)
     {
+        // WARNING: this doesn't take 1.20.3+ uuid field into account!
+        // I'm not even sure this is actually called.
         this.status = readVarInt(buf);
     }
 
     @Override
-    public void read(final ByteBuf buf, final ProtocolConstants.Direction direction, final int ProtocolConstants)
+    public void read(final ByteBuf buf, final ProtocolConstants.Direction direction, final int clientVersion)
     {
+        if (Packets.is1_20_3OrGreater(clientVersion))
+            id = readUUID(buf);
         this.status = readVarInt(buf);
     }
 
     @Override
     public void write(final ByteBuf buf)
     {
+        // WARNING: this doesn't take 1.20.3+ uuid field into account!
+        // I'm not even sure this is actually called.
         writeVarInt(status, buf);
     }
 
     @Override
-    public void write(final ByteBuf buf, final ProtocolConstants.Direction direction, final int ProtocolConstants)
+    public void write(final ByteBuf buf, final ProtocolConstants.Direction direction, final int clientVersion)
     {
+        if (Packets.is1_20_3OrGreater(clientVersion))
+            writeUUID(id, buf);
         writeVarInt(status, buf);
     }
 
@@ -116,19 +141,19 @@ public class ServerboundResourcePackPacket extends ServerboundPacket
             return false;
 
         final ServerboundResourcePackPacket thisNut = (ServerboundResourcePackPacket) o;
-        return Objects.equals(this.status, thisNut.status);
+        return Objects.equals(this.id, thisNut.id) && Objects.equals(this.status, thisNut.status);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(this.status);
+        return Objects.hash(this.id, this.status);
     }
 
     @Override
     public String toString()
     {
-        return "ServerboundResourcePackPacket{status=" + Status.values()[this.status] + "}";
+        return "ServerboundResourcePackPacket{id=" + id + ", status=" + Status.values()[this.status] + "}";
     }
 
     public enum Status
@@ -136,6 +161,10 @@ public class ServerboundResourcePackPacket extends ServerboundPacket
         SUCCESSFULLY_LOADED,
         DECLINED,
         FAILED_DOWNLOAD,
-        ACCEPTED;
+        ACCEPTED,
+        DOWNLOADED, // 1.20.3+
+        INVALID_URL, // 1.20.3+
+        FAILED_RELOAD, // 1.20.3+
+        DISCARDED, // 1.20.3+
     }
 }

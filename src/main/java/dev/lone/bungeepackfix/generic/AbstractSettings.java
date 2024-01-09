@@ -15,11 +15,13 @@ public abstract class AbstractSettings<T>
 {
     protected ComponentSerializer<Component, ?, String> SERIALIZER;
 
+    public boolean equal_pack_attribute_modern_uuid;
     public boolean equal_pack_attributes_hash;
     public boolean equal_pack_attributes_forced;
     public boolean equal_pack_attributes_prompt_message;
 
     public boolean ignore_hash_in_url;
+    public boolean cancel_modern_resourcepack_remove_packet;
     public String main_server_name;
 
     public boolean ignored_servers_enabled;
@@ -42,11 +44,13 @@ public abstract class AbstractSettings<T>
         config = new YamlConfig(new File(dataDirectory.toFile(), "config.yml").toPath());
         config.loadConfig(defaultConfigStream);
 
+        equal_pack_attribute_modern_uuid = config.getBoolean("equal_pack_attributes.modern_uuid", true);
         equal_pack_attributes_hash = config.getBoolean("equal_pack_attributes.hash", true);
         equal_pack_attributes_forced = config.getBoolean("equal_pack_attributes.forced", true);
         equal_pack_attributes_prompt_message = config.getBoolean("equal_pack_attributes.prompt_message", true);
 
         ignore_hash_in_url = config.getBoolean("ignore_hash_in_url", true);
+        cancel_modern_resourcepack_remove_packet = config.getBoolean("cancel_modern_resourcepack_remove_packet", true);
         main_server_name = config.getString("main_server_name", "server_1");
 
         ignored_servers_enabled = config.getBoolean("ignored_servers.enabled");
