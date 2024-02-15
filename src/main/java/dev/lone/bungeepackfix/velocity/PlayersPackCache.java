@@ -5,6 +5,7 @@ import com.velocitypowered.api.proxy.player.ResourcePackInfo;
 import dev.lone.bungeepackfix.generic.AbstractPlayersPackCache;
 import dev.lone.bungeepackfix.generic.PackUtility;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
@@ -54,7 +55,7 @@ public class PlayersPackCache extends AbstractPlayersPackCache
         final String prevUrl = PackUtility.removeHashtag(ignoreHashtagInUrl, playerPack.getUrl());
 
         return (Objects.equals(prevUrl, newUrl)) &&
-                (!checkHash || Objects.equals(playerPack.getHash(), newPack.getHash())) &&
+                (!checkHash || Arrays.equals(playerPack.getHash(), newPack.getHash())) &&
                 (!checkForced || Objects.equals(playerPack.getShouldForce(), newPack.getShouldForce())) &&
                 (!checkMsg || Objects.equals(playerPack.getPrompt(), newPack.getPrompt()))
                 ;
