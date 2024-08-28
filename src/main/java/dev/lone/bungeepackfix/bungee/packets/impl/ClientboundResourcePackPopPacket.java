@@ -95,7 +95,15 @@ public class ClientboundResourcePackPopPacket extends ClientboundPacket
     @Override
     public void read(final ByteBuf buf)
     {
-        id = buf.readBoolean() ? Optional.of(readUUID(buf)) : Optional.empty();
+        if (buf.readBoolean()) {
+            try {
+                id = Optional.of(readUUID(buf));
+            } catch (Throwable ignored) {
+                id = Optional.empty();
+            }
+        } else {
+            id = Optional.empty();
+        }
     }
 
     @Override
